@@ -238,6 +238,13 @@ function civicrm_wp_invoke() {
     return '';
   }
 
+  // CRM-12523 - WordPress has it's own timezone calculations
+  $WP_base_timezone = date_default_timezone_get();
+  $WP_user_timezone = get_option('timezone_string');
+  if ($WP_user_timezone) {
+     date_default_timezone_set($WP_user_timezone);
+  }
+  
   // CRM-95XX
   // At this point we are calling a civicrm function
   // Since WP messes up and always quotes the request, we need to reverse
@@ -269,6 +276,8 @@ function civicrm_wp_invoke() {
 
   require_once 'CRM/Core/Invoke.php';
   CRM_Core_Invoke::invoke($args);
+
+  date_default_timezone_set($WP_base_timezone);
 }
 
 function civicrm_wp_scripts() {
